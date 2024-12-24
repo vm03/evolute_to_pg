@@ -34,6 +34,84 @@ def get_tokens_from_db():
         cursor.close()
         conn.close()
 
+
+def save_stats_to_db(odometer, battery_percentage):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("SELECT battery_percentage, battery_percentage_charged, battery_percentage_consumed FROM stats ORDER BY time DESC LIMIT 1")
+        result1 = cursor.fetchone()
+        battery_percentage0, battery_percentage_charged, battery_percentage_consumed = result1
+        if battery_percentage > battery_percentage0:
+            battery_percentage_charged = battery_percentage_charged + (battery_percentage - battery_percentage0)
+        if battery_percentage0 > battery_percentage:
+            battery_percentage_consumed = battery_percentage_consumed + (battery_percentage0 - battery_percentage)
+        cursor.execute("SELECT odometer, battery_percentage_consumed FROM stats WHERE odometer <= %s - 10  ORDER BY time DESC  LIMIT 1", [odometer])
+        result2 = cursor.fetchone()
+        if result2:
+            odometer2, battery_percentage_consumed2 = result2
+            if battery_percentage_consumed-battery_percentage_consumed2 != 0 and odometer-odometer2 != 0:
+                avg10km = (battery_percentage_consumed-battery_percentage_consumed2)/(odometer-odometer2)
+                rem10 = battery_percentage/avg10km
+                avg10km = avg10km*53
+            else:
+                avg10km = 0;
+                rem10 = 0;
+        else:
+            avg10km = 0;
+            rem10 = 0;
+        cursor.execute("SELECT odometer, battery_percentage_consumed FROM stats  WHERE odometer <= %s - 100  ORDER BY time DESC  LIMIT 1", [odometer])
+        result3 = cursor.fetchone()
+        if result3:
+            odometer3, battery_percentage_consumed3 = result3
+            if battery_percentage_consumed-battery_percentage_consumed3 != 0 and odometer-odometer3 != 0:
+                avg100km = (battery_percentage_consumed-battery_percentage_consumed3)/(odometer-odometer3)
+                rem100 = battery_percentage/avg100km
+                avg100km = avg100km*53
+            else:
+                avg100km = 0;
+                rem100 = 0;
+        else:
+           avg100km = 0;
+           rem100 = 0;
+        cursor.execute("SELECT odometer, battery_percentage_consumed FROM stats  WHERE odometer <= %s - 30  ORDER BY time DESC  LIMIT 1", [odometer])
+        result4 = cursor.fetchone()
+        if result4:
+            odometer4, battery_percentage_consumed4 = result4
+            if battery_percentage_consumed-battery_percentage_consumed4 != 0 and odometer-odometer4 != 0:
+                avg30km = (battery_percentage_consumed-battery_percentage_consumed4)/(odometer-odometer4)
+                rem30 = battery_percentage/avg30km
+                avg30km = avg30km*53
+            else:
+                avg30km = 0;
+                rem30 = 0;
+        else:
+           avg30km = 0;
+           rem30 = 0;
+        cursor.execute("SELECT odometer, battery_percentage_consumed FROM stats  WHERE odometer <= %s - 50  ORDER BY time DESC  LIMIT 1", [odometer])
+        result5 = cursor.fetchone()
+        if result5:
+            odometer5, battery_percentage_consumed5 = result5
+            if battery_percentage_consumed-battery_percentage_consumed5 != 0 and odometer-odometer5 != 0:
+                avg50km = (battery_percentage_consumed-battery_percentage_consumed5)/(odometer-odometer5)
+                rem50 = battery_percentage/avg50km
+                avg50km = avg50km*53
+            else:
+                avg50km = 0;
+                rem50 = 0;
+        else:
+           avg50km = 0;
+           rem50 = 0;
+        cursor.execute("INSERT INTO stats (time, odometer, battery_percentage, battery_percentage_charged, battery_percentage_consumed, avg10km, avg100km, avg30km, avg50km, rem10, rem100, rem30, rem50 ) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (odometer, battery_percentage, battery_percentage_charged, battery_percentage_consumed, avg10km, avg100km, avg30km, avg50km, rem10, rem100, rem30, rem50))
+        conn.commit()
+    except Exception as e:
+        print(f"Ошибка сохранения статистики: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_data():
     access_token, refresh_token = get_tokens_from_db()
     if not access_token or not refresh_token:
@@ -106,6 +184,7 @@ def save_data_to_db():
             conn.commit()
             cur.close()
             conn.close()
+            save_stats_to_db(sensorsData.get("odometer"), sensorsData.get("batteryPercentage"))
             return True
         except Exception as e:
             print("Ошибка при вставке данных:", e)

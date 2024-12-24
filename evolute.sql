@@ -54,3 +54,21 @@ CREATE TABLE token_storage (
     refresh_token text NOT NULL,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+CREATE TABLE stats (
+    "time" timestamp with time zone DEFAULT now() NOT NULL,
+    odometer integer,
+    battery_percentage integer,
+    battery_percentage_charged integer,
+    battery_percentage_consumed integer,
+    avg10km double precision,
+    avg30km double precision,
+    avg50km double precision,
+    avg100km double precision,
+    rem10 double precision,
+    rem30 double precision,
+    rem50 double precision,
+    rem100 double precision
+);
+
+SELECT create_hypertable('stats', 'time');
