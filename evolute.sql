@@ -31,7 +31,8 @@ CREATE TABLE sensors_data (
     climate_ac_status integer,
     climate_status integer,
     climate_f_window_status integer,
-    immobiliser integer
+    immobiliser integer,
+    soh integer
 );
 
 SELECT create_hypertable('sensors_data', 'time');

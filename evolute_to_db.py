@@ -158,14 +158,14 @@ def save_data_to_db():
             door_rr_status, door_rl_status, head_lights_status, ready_status, battery_temp,
             climate_air_circulation, coolant_temp, in_board_temp, climate_fan_direction,
             climate_target_temp, climate_fan_speed, climate_auto_status, climate_r_window_status,
-            charging_status, climate_ac_status, climate_status, climate_f_window_status, immobiliser
+            charging_status, climate_ac_status, climate_status, climate_f_window_status, immobiliser,soh
         ) VALUES (
             NOW(), %(ptc)s, %(12VBatteryVoltage)s, %(odometer)s, %(batteryPercentage)s, %(remainsMileage)s,
             %(ignitionStatus)s, %(outsideTemp)s, %(centralLockingStatus)s, %(doorFLStatus)s, %(doorFRStatus)s, %(trunkStatus)s,
             %(doorRRStatus)s, %(doorRLStatus)s, %(headLightsStatus)s, %(ready)s, %(batteryTemp)s,
             %(climateAirCirculation)s, %(coolantTemp)s, %(inBoardTemp)s, %(climateFanDirection)s,
             %(climateTargetTemp)s, %(climateFanSpeed)s, %(climateAutoStatus)s, %(climateRWindowStatus)s,
-            %(chargingStatus)s, %(climateACStatus)s, %(climateStatus)s, %(climateFWindowStatus)s, %(immobiliser)s
+            %(chargingStatus)s, %(climateACStatus)s, %(climateStatus)s, %(climateFWindowStatus)s, %(immobiliser)s , %(soh)s
         );
         """
         query_p = """
